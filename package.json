@@ -1,0 +1,26 @@
+{
+  "name": "currency_convertor",
+  "version": "1.0.0",
+  "description": "creating a currency convertor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Edmund044/currency_convertor.git"
+  },
+  "keywords": [
+    "flask",
+    "tailwind"
+  ],
+  "author": "Edmund Opiyo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Edmund044/currency_convertor/issues"
+  },
+  "homepage": "https://github.com/Edmund044/currency_convertor#readme",
+  "dependencies": {
+    "tailwindcss": "^3.1.2"
+  }
+}
