@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, render_template,request, url_for
-from use_cases import make_request_to_convert_currency
+import use_cases
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
@@ -78,7 +78,7 @@ def handle_convert_currency():
           currency1 = request.form["currency1"] 
           currency2 = request.form["currency2"]       
           
-    response = make_request_to_convert_currency(amount1, currency1, currency2)
+    response = use_cases.make_request_to_convert_currency(amount1, currency1, currency2)
     return render_template("converted-currency.html", amount1 = amount1,amount2 = response["result"],currency1 = currency1,currency2 = currency2)
 
 @app.route("/handle-transfer-money", methods=["POST"])
