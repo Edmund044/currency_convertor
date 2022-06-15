@@ -36,7 +36,7 @@ def convert():
 
 @app.route("/transfer-money")
 def transfer():
-    return render_template("transfer-money.html")
+    return render_template("transfer.html")
 
 
 @app.route("/profile")
