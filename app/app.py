@@ -159,7 +159,7 @@ def handle_profile_update():
         picture = request.form["picture"]
         id = request.form["id"]
         
-        the_user = db.session.query(User).filter(User.id == id ).one()
+        the_user = db.session.query(User).filter(User.id == id ).first()
         the_user.first_name = first_name
         the_user.second_name = second_name
         the_user.currency = currency
@@ -211,11 +211,11 @@ def handle_transfer_money():
                 new_balance = float(wallet_balance) - (float(amount_to_send) +
                                                     float(amount_to_send) * transaction_rate_fee)
                 # update sender wallet
-                the_sender = db.session.query(User).filter(User.wallet_number == sender_wallet_number).one()
+                the_sender = db.session.query(User).filter(User.wallet_number == sender_wallet_number).first()
                 the_sender.wallet_balance = new_balance
                 db.session.commit()
                 # update receiver wallet
-                the_receiver = db.session.query(User).filter(User.wallet_number == receiver_wallet_number).one()
+                the_receiver = db.session.query(User).filter(User.wallet_number == receiver_wallet_number).first()
                 the_receiver.wallet_balance = float(amount_to_receive) + float(receiver.wallet_balance)
                 db.session.commit()
 
