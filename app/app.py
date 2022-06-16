@@ -35,7 +35,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20), nullable=False)
     second_name = db.Column(db.String(20), nullable=False)
-    email = db.Column(db.String(20), nullable=False, unique=True)
+    email = db.Column(db.String(80), nullable=False, unique=True)
     picture = db.Column(db.String(20), nullable=True)
     password = db.Column(db.String(100), nullable=False)
     currency = db.Column(db.String(5), nullable=False)
@@ -47,6 +47,9 @@ class User(db.Model):
 def index():
     return render_template("signup.html")
 
+@app.route("/signup")
+def signup():
+    return render_template("signup.html")
 
 @app.route("/convert-currency")
 def convert():
