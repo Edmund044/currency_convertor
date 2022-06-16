@@ -129,7 +129,8 @@ def handle_signin():
             session["picture"] = user.picture
             session["currency"] = user.currency
             session["wallet_number"] = user.wallet_number
-            
+            session["wallet_balance"] = user.wallet_balance
+
             if check_password_hash(user.password, password):
                 return render_template("dashboard.html", first_name=user.first_name, second_name=user.second_name, wallet_number=user.wallet_number, wallet_balance=user.wallet_balance, currency=user.currency, profile_picture=user.picture)
             else:
@@ -217,7 +218,7 @@ def handle_transfer_money():
 
             return render_template("transfered-money.html", amount_to_receive=amount_to_receive, wallet_number=receiver_wallet_number, transfer_status=transfer_status, sender_currency=sender_currency, receiver_currency=receiver_currency, new_balance=new_balance, transaction_cost=transaction_cost)
         else:
-
+           return "User does not exist"
 
 @app.route("/health")
 def health():
