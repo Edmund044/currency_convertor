@@ -82,16 +82,16 @@
           <div>
             <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Update Your Profile</h2>
           </div>
-          <form class="mt-8 space-y-6" action="/handle-signup" method="POST">
+          <form class="mt-8 space-y-6" action="/handle-profile-update" method="POST">
             <input type="hidden" name="remember" value="true"/>
             <div class="rounded-md shadow-sm -space-y-px">
             <div>
                 <label htmlFor="email-address" class="block text-sm font-medium text-gray-700">First Name</label>
-                <input id="email-address" value="{{session.first_name}}" minlength="8" maxlength="20" name="first_name" type="text"  required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="First Name"/>
+                <input id="email-address" value="{{session.first_name}}" minlength="3" maxlength="20" name="first_name" type="text"  required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="First Name"/>
               </div>
               <div>
                 <label htmlFor="email-address" class="block text-sm font-medium text-gray-700">Last Name</label>
-                <input id="email-address" value="{{session.second_name}}" minlength="8" maxlength="20" name="second_name" type="text"  required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Last Name"/>
+                <input id="email-address" value="{{session.second_name}}" minlength="3" maxlength="20" name="second_name" type="text"  required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Last Name"/>
               </div>
               <div>
                 <label htmlFor="country" class="block text-sm font-medium text-gray-700">Choose Currency</label>
@@ -122,7 +122,9 @@
               </div>
                 </div>
             </div>
-      
+            <div class="">
+              <input id="email-address" name="id"  value="{{session.user_id}}" type="hidden"  required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="0"/>
+            </div>
            
       
             <div>
@@ -133,7 +135,7 @@
                     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                   </svg>
                 </span>
-                Sign Up
+                Update Profile
               </button>
             </div>
           </form>
