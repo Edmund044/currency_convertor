@@ -1,6 +1,9 @@
-from flask import Flask, jsonify, render_template, request, url_for
+from flask import Flask, jsonify, render_template, request, url_for, redirect
 import requests
 import json
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from random import randint
 
 
 def make_request_to_convert_currency(amount1,  currency1, currency2):
@@ -22,6 +25,22 @@ def make_request_to_convert_currency(amount1,  currency1, currency2):
 
 app = Flask(__name__, template_folder='../templates',
             static_folder='../static')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///currency_convertor.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+
+class User(db.Model):
+    __tablename__ = "user"
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(20), nullable=False)
+    second_name = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(20), nullable=False, unique=True)
+    picture = db.Column(db.String(20), nullable=True)
+    password = db.Column(db.String(100), nullable=False)
+    currency = db.Column(db.String(5), nullable=False)
+    wallet_number = db.Column(db.Integer, nullable=False)
+    wallet_balance = db.Column(db.Float(20), nullable=False)
 
 
 @app.route("/")
@@ -56,16 +75,33 @@ def dashboard():
 
 @app.route("/handle-signup", methods=["POST"])
 def handle_signup():
-    if request.method == "POST":
-        first_name = request.form["first_name"]
-        second_name = request.form["second_name"]
-        currency = request.form["currency"]
-        email = request.form["email"]
-        picture = request.form["picture"]
-        password = request.form["password"]
-        confirm_password = request.form["confirm_password"]
+    try:
+        if request.method == "POST":
+            first_name = request.form["first_name"]
+            second_name = request.form["second_name"]
+            currency = request.form["currency"]
+            email = request.form["email"]
+            picture = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+            password = request.form["password"]
+            confirm_password = request.form["confirm_password"]
+            wallet_number = randint(123545224, 873648754)
+            if password != confirm_password:
+                return "Passwords do not match"
+            user = User.query.filter_by(email=email).first()
+            if user:
+                return "User already exists"
+            else:
+                response = make_request_to_convert_currency(
+                    "1000", "USD", currency)
+            wallet_balance = response["result"]
+            new_user = User(first_name=first_name, second_name=second_name, currency=currency, email=email, picture=picture, wallet_number=wallet_number, wallet_balance=wallet_balance,
+                            password=generate_password_hash(password, method='sha256'))
+            db.session.add(new_user)
+            db.session.commit()
 
-    return render_template("dashboard.html")
+        return redirect(url_for("signin"))
+    except:
+        return redirect(url_for("signin"))
 
 
 @app.route("/handle-signin", methods=["POST"])
@@ -73,8 +109,14 @@ def handle_signin():
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
-
-    return render_template("dashboard.html")
+        user = User.query.filter_by(email=email).first()
+        if user:
+            if check_password_hash(user.password, password):
+                return redirect(url_for("convert"))
+            else:
+                return "Password is incorrect"
+        else:
+            return "User does not exist"
 
 
 @app.route("/get_transaction", methods=["POST"])
@@ -126,31 +168,35 @@ def handle_transfer_money():
         wallet_number = request.form["wallet_number"]
     # make sure wallets exists
     if float(amount_to_send) + float(amount_to_send) * transaction_rate_fee < wallet_balance:
-      transfer_status = "Succesful transfer"
-      transaction_cost = float(amount_to_send) * transaction_rate_fee
-      amount_to_receive = float(amount_to_send) * rate
-      new_balance = float(wallet_balance) - (float(amount_to_send) + float(amount_to_send) * transaction_rate_fee)
-      #update sender wallet
-      #update receiver wallet
+        transfer_status = "Succesful transfer"
+        transaction_cost = float(amount_to_send) * transaction_rate_fee
+        amount_to_receive = float(amount_to_send) * rate
+        new_balance = float(wallet_balance) - (float(amount_to_send) +
+                                               float(amount_to_send) * transaction_rate_fee)
+        # update sender wallet
+        # update receiver wallet
 
     elif float(amount_to_send) + float(amount_to_send) * transaction_rate_fee > wallet_balance:
-      transfer_status = "Insufficient funds" 
-      transaction_cost = 0
-      amount_to_receive = 0
-      new_balance = wallet_balance     
+        transfer_status = "Insufficient funds"
+        transaction_cost = 0
+        amount_to_receive = 0
+        new_balance = wallet_balance
     else:
-      transfer_status = "Failed transfer"  
-      transaction_cost = 0
-      new_balance = wallet_balance
+        transfer_status = "Failed transfer"
+        transaction_cost = 0
+        new_balance = wallet_balance
 
-
-
-    return render_template("transfered-money.html", amount_to_receive=amount_to_receive, wallet_number=wallet_number, transfer_status=transfer_status, sender_currency=sender_currency, receiver_currency=receiver_currency, new_balance=new_balance,transaction_cost=transaction_cost)
+    return render_template("transfered-money.html", amount_to_receive=amount_to_receive, wallet_number=wallet_number, transfer_status=transfer_status, sender_currency=sender_currency, receiver_currency=receiver_currency, new_balance=new_balance, transaction_cost=transaction_cost)
 
 
 @app.route("/health")
 def health():
-    return render_template("index.html")
+    return {
+        "data": {
+            "status": "ok",
+            "message": "API is up and running"
+        }
+    }
 
 
 @app.route("/v1/")
