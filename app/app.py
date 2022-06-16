@@ -123,6 +123,7 @@ def handle_signin():
         password = request.form["password"]
         user = User.query.filter_by(email=email).first()
         if user:
+            session["user_id"] = user.id
             session["first_name"] = user.first_name
             session["second_name"] = user.second_name
             session["email"] = user.email
@@ -156,9 +157,21 @@ def handle_profile_update():
         currency = request.form["currency"]
         email = request.form["email"]
         picture = request.form["picture"]
-        password = request.form["password"]
-        confirm_password = request.form["confirm_password"]
-
+        id = request.form["id"]
+        
+        the_user = db.session.query(User).filter(User.id == id ).one()
+        the_user.first_name = first_name
+        the_user.second_name = second_name
+        the_user.currency = currency
+        the_user.email = email
+        the_user.picture = picture    
+        db.session.commit()
+        session["user_id"] = id
+        session["first_name"] = first_name
+        session["second_name"] = second_name
+        session["email"] = email
+        session["picture"] = picture
+        session["currency"] = currency
     return render_template("dashboard.html")
 
 
