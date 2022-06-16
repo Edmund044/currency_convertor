@@ -112,7 +112,7 @@ def handle_signin():
         user = User.query.filter_by(email=email).first()
         if user:
             if check_password_hash(user.password, password):
-                return redirect(url_for("convert"))
+                return render_template("dashboard.html",first_name=user.first_name, second_name=user.second_name,wallet_number=user.wallet_number,wallet_balance=user.wallet_balance,currency=user.currency,profile_picture=user.picture)
             else:
                 return "Password is incorrect"
         else:
