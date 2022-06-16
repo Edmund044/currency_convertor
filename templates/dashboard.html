@@ -103,14 +103,14 @@
             <img
            width={24}
            height={24}
-             class="mb-3 w-24 h-24 rounded-full shadow-lg" src="{{profile_picture}}" alt="Bonnie image"
+             class="mb-3 w-24 h-24 rounded-full shadow-lg" src="{{session.picture}}" alt="Bonnie image"
            /> 
               
-               <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">{{first_name}} {{second_name}}</h5>
+               <h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">{{session.first_name}} {{session.second_name}}</h5>
                <br>
-               <span class="text-sm text-gray-500 dark:text-gray-400">Wallet Number:<span class="text-sm font-bold text-indigo-800">{{wallet_number}}</span></span>
+               <span class="text-sm text-gray-500 dark:text-gray-400">Wallet Number:<span class="text-sm font-bold text-indigo-800">{{session.wallet_number}}</span></span>
                <br>
-               <span class="text-sm text-gray-500 dark:text-gray-400">Wallet Balance:<span class="text-sm font-bold text-indigo-800">{{currency}} {{wallet_balance}}</span></span>
+               <span class="text-sm text-gray-500 dark:text-gray-400">Wallet Balance:<span class="text-sm font-bold text-indigo-800">{{session.currency}} {{session.wallet_balance}}</span></span>
                <br>
                <a href="{{ url_for('transfer') }}" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"><button type="submit" >
                  
