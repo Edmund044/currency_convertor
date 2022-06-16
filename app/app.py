@@ -101,7 +101,7 @@ def handle_signup():
 
         return redirect(url_for("signin"))
     except:
-        return redirect(url_for("signin"))
+        return redirect(url_for("error"))
 
 
 @app.route("/handle-signin", methods=["POST"])
