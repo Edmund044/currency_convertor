@@ -1,4 +1,5 @@
-from flask import Flask, jsonify, render_template, request, url_for, redirect
+from flask import Flask, jsonify, render_template, request, url_for, redirect,session
+from flask_session import Session
 import requests
 import json
 from flask_sqlalchemy import SQLAlchemy
@@ -25,6 +26,9 @@ def make_request_to_convert_currency(amount1,  currency1, currency2):
 
 app = Flask(__name__, template_folder='../templates',
             static_folder='../static')
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)            
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///currency_convertor.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -47,9 +51,11 @@ class User(db.Model):
 def index():
     return render_template("signup.html")
 
+
 @app.route("/signup")
 def signup():
     return render_template("signup.html")
+
 
 @app.route("/convert-currency")
 def convert():
@@ -117,8 +123,16 @@ def handle_signin():
         password = request.form["password"]
         user = User.query.filter_by(email=email).first()
         if user:
+            session["first_name"] = user.first_name
+            session["second_name"] = user.second_name
+            session["email"] = user.email
+            session["picture"] = user.picture
+            session["currency"] = user.currency
+            session["wallet_number"] = user.wallet_number
+            session["wallet_balance"] = user.wallet_balance
+
             if check_password_hash(user.password, password):
-                return render_template("dashboard.html",first_name=user.first_name, second_name=user.second_name,wallet_number=user.wallet_number,wallet_balance=user.wallet_balance,currency=user.currency,profile_picture=user.picture)
+                return render_template("dashboard.html", first_name=user.first_name, second_name=user.second_name, wallet_number=user.wallet_number, wallet_balance=user.wallet_balance, currency=user.currency, profile_picture=user.picture)
             else:
                 return "Password is incorrect"
         else:
@@ -161,39 +175,50 @@ def handle_convert_currency():
 
 @app.route("/handle-transfer-money", methods=["POST"])
 def handle_transfer_money():
-    transaction_rate_fee = 0.05
-    wallet_balance = 10000
-    amount_to_send = 0
-    wallet_number = 0
-    sender_currency = "USD"
-    receiver_currency = "NGN"
-    amount_to_receive = 0
-    rate = 0.89
     if request.method == "POST":
         amount_to_send = request.form["amount_to_send"]
-        wallet_number = request.form["wallet_number"]
+        receiver_wallet_number = request.form["receiver_wallet_number"]
+        sender_wallet_number = request.form["sender_wallet_number"]
+
     # make sure wallets exists
-    if float(amount_to_send) + float(amount_to_send) * transaction_rate_fee < wallet_balance:
-        transfer_status = "Succesful transfer"
-        transaction_cost = float(amount_to_send) * transaction_rate_fee
-        amount_to_receive = float(amount_to_send) * rate
-        new_balance = float(wallet_balance) - (float(amount_to_send) +
-                                               float(amount_to_send) * transaction_rate_fee)
-        # update sender wallet
-        # update receiver wallet
+        sender = User.query.filter_by(
+            wallet_number=sender_wallet_number).first()
+        receiver = User.query.filter_by(
+            wallet_number=receiver_wallet_number).first()
+        if receiver:
+            transaction_rate_fee = 0.05
+            wallet_balance = receiver.wallet_balance
+            sender_currency = receiver.currency
+            receiver_currency = sender.currency
+            if float(amount_to_send) + float(amount_to_send) * transaction_rate_fee < wallet_balance:
+                transfer_status = "Succesful transfer"
+                transaction_cost = float(amount_to_send) * transaction_rate_fee
+                response = make_request_to_convert_currency(amount_to_send, sender_currency, receiver_currency)
+                amount_to_receive = response["result"]
+                new_balance = float(wallet_balance) - (float(amount_to_send) +
+                                                    float(amount_to_send) * transaction_rate_fee)
+                # update sender wallet
+                the_sender = db.session.query(User).filter(User.wallet_number == sender_wallet_number).one()
+                the_sender.wallet_balance = new_balance
+                db.session.commit()
+                # update receiver wallet
+                the_receiver = db.session.query(User).filter(User.wallet_number == receiver_wallet_number).one()
+                the_receiver.wallet_balance = float(amount_to_receive) + float(receiver.wallet_balance)
+                db.session.commit()
 
-    elif float(amount_to_send) + float(amount_to_send) * transaction_rate_fee > wallet_balance:
-        transfer_status = "Insufficient funds"
-        transaction_cost = 0
-        amount_to_receive = 0
-        new_balance = wallet_balance
-    else:
-        transfer_status = "Failed transfer"
-        transaction_cost = 0
-        new_balance = wallet_balance
+            elif float(amount_to_send) + float(amount_to_send) * transaction_rate_fee > wallet_balance:
+                transfer_status = "Insufficient funds"
+                transaction_cost = 0
+                amount_to_receive = 0
+                new_balance = wallet_balance
+            else:
+                transfer_status = "Failed transfer"
+                transaction_cost = 0
+                new_balance = wallet_balance
 
-    return render_template("transfered-money.html", amount_to_receive=amount_to_receive, wallet_number=wallet_number, transfer_status=transfer_status, sender_currency=sender_currency, receiver_currency=receiver_currency, new_balance=new_balance, transaction_cost=transaction_cost)
-
+            return render_template("transfered-money.html", amount_to_receive=amount_to_receive, wallet_number=receiver_wallet_number, transfer_status=transfer_status, sender_currency=sender_currency, receiver_currency=receiver_currency, new_balance=new_balance, transaction_cost=transaction_cost)
+        else:
+           return "User does not exist"
 
 @app.route("/health")
 def health():
