@@ -87,15 +87,16 @@
             <div class="rounded-md shadow-sm -space-y-px">
             <div>
                 <label htmlFor="email-address" class="block text-sm font-medium text-gray-700">First Name</label>
-                <input id="email-address" minlength="8" maxlength="20" name="first_name" type="text"  required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="First Name"/>
+                <input id="email-address" value="{{session.first_name}}" minlength="8" maxlength="20" name="first_name" type="text"  required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="First Name"/>
               </div>
               <div>
                 <label htmlFor="email-address" class="block text-sm font-medium text-gray-700">Last Name</label>
-                <input id="email-address" minlength="8" maxlength="20" name="second_name" type="text"  required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Last Name"/>
+                <input id="email-address" value="{{session.second_name}}" minlength="8" maxlength="20" name="second_name" type="text"  required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Last Name"/>
               </div>
               <div>
                 <label htmlFor="country" class="block text-sm font-medium text-gray-700">Choose Currency</label>
                             <select id="country" name="currency" required autoComplete="currency" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                              <option selected>{{session.currency}}</option>
                               <option>USD</option>
                               <option>EUR</option>
                               <option>JPY</option>
@@ -112,7 +113,7 @@
                              </div>
               <div>
                 <label htmlFor="email-address" class="block text-sm font-medium text-gray-700">Email address</label>
-                <input id="email-address" minlength="8" maxlength="80" name="email" type="email" autoComplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email address"/>
+                <input id="email-address"  value="{{session.email}}" minlength="8" maxlength="80" name="email" type="email" autoComplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email address"/>
               </div>
               <div>
               <div>
