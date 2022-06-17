@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request, url_for, redirect,session
+from flask import Flask, jsonify, render_template, request, url_for, redirect,session,flash
 from flask_session import Session
 import requests
 import json
@@ -289,6 +289,13 @@ def page_not_found(e):
         "message": "Internal server errror"
     }
 
+def runServer(host='0.0.0.0'):
+
+    app.run(host)
+
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    try:
+        runServer()
+    finally:
+        app.run()
