@@ -14,7 +14,7 @@ def make_request_to_convert_currency(amount1,  currency1, currency2):
 
     payload = {}
     headers = {
-        "apikey": "Slyih31Y8eUs3dRJgZyPjaPCzVh8s01y"
+        "apikey": "x0CghhnZZ8OA6CB1zkubZU8xhCTK2kWg"
     }
 
     response = requests.request("GET", url, headers=headers, data=payload)
