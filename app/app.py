@@ -159,10 +159,14 @@ def handle_profile_update():
         picture = request.form["picture"]
         id = request.form["id"]
         
+
         the_user = db.session.query(User).filter(User.id == id ).first()
+        response = make_request_to_convert_currency(
+                     the_user.wallet_balance,the_user.currency, currency)
         the_user.first_name = first_name
         the_user.second_name = second_name
         the_user.currency = currency
+        the_user.wallet_balance = response["result"]
         the_user.email = email
         the_user.picture = picture    
         db.session.commit()
