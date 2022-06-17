@@ -162,7 +162,7 @@ def handle_profile_update():
 
         the_user = db.session.query(User).filter(User.id == id ).first()
         response = make_request_to_convert_currency(
-                     the_user.wallet_balance,the_user.currency, currency)
+                     str(the_user.wallet_balance),the_user.currency, currency)
         the_user.first_name = first_name
         the_user.second_name = second_name
         the_user.currency = currency
@@ -176,6 +176,7 @@ def handle_profile_update():
         session["email"] = email
         session["picture"] = picture
         session["currency"] = currency
+        session["wallet_balance"] = response["result"]
     return render_template("dashboard.html")
 
 
@@ -203,21 +204,24 @@ def handle_transfer_money():
         receiver = User.query.filter_by(
             wallet_number=receiver_wallet_number).first()
         if receiver:
+            if receiver == sender:
+             return "Cannot send money to your own wallet"
             transaction_rate_fee = 0.05
-            wallet_balance = receiver.wallet_balance
-            sender_currency = receiver.currency
-            receiver_currency = sender.currency
+            wallet_balance = sender.wallet_balance
+            sender_currency = sender.currency
+            receiver_currency = receiver.currency
             if float(amount_to_send) + float(amount_to_send) * transaction_rate_fee < wallet_balance:
                 transfer_status = "Succesful transfer"
                 transaction_cost = float(amount_to_send) * transaction_rate_fee
                 response = make_request_to_convert_currency(amount_to_send, sender_currency, receiver_currency)
                 amount_to_receive = response["result"]
                 new_balance = float(wallet_balance) - (float(amount_to_send) +
-                                                    float(amount_to_send) * transaction_rate_fee)
+                                                    float(amount_to_send) * transaction_rate_fee)                                   
                 # update sender wallet
                 the_sender = db.session.query(User).filter(User.wallet_number == sender_wallet_number).first()
                 the_sender.wallet_balance = new_balance
                 db.session.commit()
+                session["wallet_balance"] = the_sender.wallet_balance
                 # update receiver wallet
                 the_receiver = db.session.query(User).filter(User.wallet_number == receiver_wallet_number).first()
                 the_receiver.wallet_balance = float(amount_to_receive) + float(receiver.wallet_balance)
@@ -235,7 +239,7 @@ def handle_transfer_money():
 
             return render_template("transfered-money.html", amount_to_receive=amount_to_receive, wallet_number=receiver_wallet_number, transfer_status=transfer_status, sender_currency=sender_currency, receiver_currency=receiver_currency, new_balance=new_balance, transaction_cost=transaction_cost)
         else:
-           return "User does not exist"
+            return "Wallet does not exist"
 
 @app.route("/health")
 def health():
