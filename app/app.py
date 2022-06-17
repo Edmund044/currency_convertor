@@ -5,7 +5,8 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from random import randint
-
+import os
+from werkzeug.utils import secure_filename
 
 def make_request_to_convert_currency(amount1,  currency1, currency2):
     url = "https://api.apilayer.com/fixer/convert?to=" + \
@@ -23,15 +24,29 @@ def make_request_to_convert_currency(amount1,  currency1, currency2):
 
     return res
 
+UPLOAD_FOLDER = './static/uploads'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__, template_folder='../templates',
             static_folder='../static')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER            
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)            
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///currency_convertor.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def upload_file(image):
+        if image and allowed_file(image.filename):
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
 
 class User(db.Model):
@@ -84,13 +99,12 @@ def dashboard():
 
 @app.route("/handle-signup", methods=["POST"])
 def handle_signup():
-    try:
         if request.method == "POST":
             first_name = request.form["first_name"]
             second_name = request.form["second_name"]
             currency = request.form["currency"]
             email = request.form["email"]
-            picture = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+            picture =  upload_file(request.files["picture"])
             password = request.form["password"]
             confirm_password = request.form["confirm_password"]
             wallet_number = randint(123545224, 873648754)
@@ -109,12 +123,7 @@ def handle_signup():
             db.session.commit()
 
         return redirect(url_for("signin"))
-    except:
-        return {
-        "status": 500,
-        "message": "Something went wrong"
-    }
-
+   
 
 @app.route("/handle-signin", methods=["POST"])
 def handle_signin():
@@ -156,10 +165,8 @@ def handle_profile_update():
         second_name = request.form["second_name"]
         currency = request.form["currency"]
         email = request.form["email"]
-        picture = request.form["picture"]
         id = request.form["id"]
-        
-
+        saved_picture_url = upload_file(request.files["picture"])
         the_user = db.session.query(User).filter(User.id == id ).first()
         response = make_request_to_convert_currency(
                      str(the_user.wallet_balance),the_user.currency, currency)
@@ -168,13 +175,13 @@ def handle_profile_update():
         the_user.currency = currency
         the_user.wallet_balance = response["result"]
         the_user.email = email
-        the_user.picture = picture    
+        the_user.picture = saved_picture_url    
         db.session.commit()
         session["user_id"] = id
         session["first_name"] = first_name
         session["second_name"] = second_name
         session["email"] = email
-        session["picture"] = picture
+        session["picture"] = saved_picture_url
         session["currency"] = currency
         session["wallet_balance"] = response["result"]
     return render_template("dashboard.html")
