@@ -89,9 +89,9 @@
             <div>
             <h2 class="mt-6  text-2xl font-extrabold text-gray-900">Transfer status:<span class="text-indigo-600">{{transfer_status}} </span> </h2>
             <h2 class="mt-6  text-2xl font-extrabold text-gray-900">Receipeint wallet:<span class="text-indigo-600">{{wallet_number}} </span> </h2>
-            <h2 class="mt-6  text-2xl font-extrabold text-gray-900">Amount received:<span class="text-indigo-600">{{amount_to_receive}} {{receiver_currency}} </span></h2>
-            <h2 class="mt-6 mb-6  text-2xl font-extrabold text-gray-900">Cost Of Transaction:<span class="text-indigo-600">{{transaction_cost}} {{sender_currency}} </span></h2>
-            <h2 class="mt-6 mb-6  text-2xl font-extrabold text-gray-900">New balance:<span class="text-indigo-600">{{new_balance}} {{sender_currency}} </span></h2>
+            <h2 class="mt-6  text-2xl font-extrabold text-gray-900">Amount received:<span class="text-indigo-600">{{receiver_currency}} {{'{:.2f}'.format(amount_to_receive)}}  </span></h2>
+            <h2 class="mt-6 mb-6  text-2xl font-extrabold text-gray-900">Cost Of Transaction:<span class="text-indigo-600">{{sender_currency}} {{'{:.2f}'.format(transaction_cost)}}  </span></h2>
+            <h2 class="mt-6 mb-6  text-2xl font-extrabold text-gray-900">New balance:<span class="text-indigo-600">{{sender_currency}} {{'{:.2f}'.format(new_balance)}} </span></h2>
            
           </div>
           <br></br>

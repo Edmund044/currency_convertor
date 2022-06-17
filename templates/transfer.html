@@ -90,7 +90,7 @@
                <br>
                <span class="text-sm text-gray-500 dark:text-gray-400">Wallet Number:<span class="text-sm font-bold text-indigo-800">{{session.wallet_number}}</span></span>
                <br>
-               <span class="text-sm text-gray-500 dark:text-gray-400">Wallet Balance:<span class="text-sm font-bold text-indigo-800">{{session.currency}} {{session.wallet_balance}}</span></span>
+               <span class="text-sm text-gray-500 dark:text-gray-400">Wallet Balance:<span class="text-sm font-bold text-indigo-800">{{session.currency}} {{'{:.2f}'.format(session.wallet_balance)}}</span></span>
                <br>
               
            </div>
